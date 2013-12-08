@@ -6,7 +6,7 @@ class Send extends noflo.AsyncComponent
     @client = null
     @async = false
     @inPorts =
-      message: new noflo.Port 'string'
+      message: new noflo.Port 'object'
       key: new noflo.Port 'string'
       async: new noflo.Port 'boolean'
     @outPorts =
