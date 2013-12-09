@@ -22,7 +22,7 @@ class Send extends noflo.AsyncComponent
   doAsync: (message, callback) ->
     return callback new Error 'Missing Mandrill API key' unless @client
     @client.messages.send
-      message: @message
+      message: message
       async: @async
     , (result) =>
       for status in result

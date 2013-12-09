@@ -32,7 +32,7 @@ class SendTemplate extends noflo.AsyncComponent
     @client.messages.sendTemplate
       template_name: @template
       template_content: @content
-      message: @message
+      message: message
       async: @async
     , (result) =>
       for status in result
