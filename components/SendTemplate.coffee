@@ -1,44 +1,65 @@
 noflo = require 'noflo'
 mandrill = require 'mandrill-api/mandrill'
 
-class SendTemplate extends noflo.AsyncComponent
-  constructor: ->
-    @client = null
-    @template = null
-    @content = null
-    @async = false
-    @inPorts =
-      template: new noflo.Port 'string'
-      content: new noflo.Port 'object'
-      message: new noflo.Port 'object'
-      key: new noflo.Port 'string'
-      async: new noflo.Port 'boolean'
-    @outPorts =
-      status: new noflo.Port 'object'
-      error: new noflo.Port 'object'
+exports.getComponent = ->
+  component = new noflo.Component
 
-    @inPorts.key.on 'data', (key) =>
-      @client = new mandrill.Mandrill key
-    @inPorts.template.on 'data', (@template) =>
-    @inPorts.content.on 'data', (@content) =>
-    @inPorts.async.on 'data', (@async) =>
+  component.inPorts.add 'template',
+    datatype: 'string'
+    required: true
+  component.inPorts.add 'content',
+    datatype: 'object'
+    required: true
+  component.inPorts.add 'message',
+    datatype: 'object'
+    required: true
+  component.inPorts.add 'key',
+    datatype: 'string'
+    process: (event, payload) ->
+      component.client = new mandrill.Mandrill payload if event is 'data'
+  component.inPorts.add 'async',
+    datatype: 'boolean'
+  component.inPorts.add 'retries',
+    datatype: 'int'
+  component.outPorts.add 'status',
+    datatype: 'object'
+  component.outPorts.add 'error',
+    datatype: 'object'
+  component.client = null
 
-    super 'message', 'status'
+  noflo.helpers.WirePattern component,
+    in: ['message', 'content']
+    params: ['template', 'async', 'retries']
+    out: 'status'
+    async: true
+    forwardGroups: true
+  , (input, groups, out, done) ->
+    return callback new Error 'Missing Mandrill API key' unless component.client
+    async = if component.params.async then true else false
+    attempts = 0
+    retries = Number component.params.retries
+    send = ->
+      attempts++
+      fail = (error) ->
+        if retries and attempts <= retries
+          setTimeout ->
+            send()
+          , 1000
+        else
+          done error
+      component.client.messages.sendTemplate
+        template_name: component.params.template
+        template_content: input.content
+        message: input.message
+        async: async
+      , (result) ->
+        if result.length > 0
+          out.send status for status in result
+          done()
+        else
+          fail new Error 'Mandrill returned empty result'
+      , (error) ->
+        fail error
+    send()
 
-  doAsync: (message, callback) ->
-    return callback new Error 'Missing Mandrill API key' unless @client
-    return callback new Error 'Missing email template' unless @template
-    return callback new Error 'Missing email contents' unless @content
-    @client.messages.sendTemplate
-      template_name: @template
-      template_content: @content
-      message: message
-      async: @async
-    , (result) =>
-      for status in result
-        @outPorts.status.send status
-      @outPorts.status.disconnect()
-    , (error) =>
-      callback error
-
-exports.getComponent = -> new SendTemplate
+  component
