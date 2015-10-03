@@ -8,7 +8,7 @@ module.exports = ->
       nodejs:
         src: ['spec/*.coffee']
         options:
-          reporter: 'dot'
+          reporter: 'spec'
 
     # Coding standards
     coffeelint:
