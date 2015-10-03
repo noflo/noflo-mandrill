@@ -16,11 +16,11 @@
     "mandrill-api": "^1.0.37"
   },
   "devDependencies": {
-    "grunt": "^0.4.1",
-    "grunt-coffeelint": "^0.0.6",
-    "grunt-cafe-mocha": "^0.1.2",
-    "chai": "^3.3.0",
-    "mocha": "^2.3.3"
+    "grunt": "~0.4.1",
+    "grunt-coffeelint": "~0.0.6",
+    "grunt-cafe-mocha": "~0.1.2",
+    "chai": "~1.9.0",
+    "mocha": "2.3.3"
   },
   "noflo": {
     "icon": "envelope",
