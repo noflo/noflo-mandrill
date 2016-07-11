@@ -1,7 +1,7 @@
 {
   "name": "noflo-mandrill",
   "description": "Mandrill email API components for NoFlo",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "author": {
     "name": "Henri Bergius",
     "email": "henri.bergius@iki.fi"
@@ -10,9 +10,15 @@
     "type": "git",
     "url": "git://github.com/noflo/noflo-mandrill.git"
   },
+  "contributors": [
+    {
+      "name": "James",
+      "email": "aretecode@gmail.com"
+    }
+  ],
   "license": "MIT",
   "dependencies": {
-    "noflo": "0.5.21",
+    "noflo": "git+https://github.com/aretecode/noflo-built.git#experiment",
     "mandrill-api": "1.0.45"
   },
   "devDependencies": {
@@ -21,13 +27,17 @@
     "grunt-coffeelint": "0.0.13",
     "grunt-cafe-mocha": "0.1.13",
     "chai": "3.4.1",
+    "grunt-noflo-manifest": "^0.1.2",
     "mocha": "2.3.4"
+  },
+  "scripts": {
+    "test": "grunt test"
   },
   "noflo": {
     "icon": "envelope",
     "components": {
-      "Send": "./components/Send.coffee",
-      "SendTemplate": "./components/SendTemplate.coffee"
+      "Send": "components/Send.coffee",
+      "SendTemplate": "components/SendTemplate.coffee"
     }
   },
   "keywords": []

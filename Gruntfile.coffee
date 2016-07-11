@@ -3,6 +3,12 @@ module.exports = ->
   @initConfig
     pkg: @file.readJSON 'package.json'
 
+    # Updating the package manifest files
+    noflo_manifest:
+      update:
+        files:
+          'package.json': ['graphs/*', 'components/*']
+
     # BDD tests on Node.js
     cafemocha:
       nodejs:
@@ -17,6 +23,7 @@ module.exports = ->
   # Grunt plugins used for testing
   @loadNpmTasks 'grunt-cafe-mocha'
   @loadNpmTasks 'grunt-coffeelint'
+  @loadNpmTasks 'grunt-noflo-manifest'
 
-  @registerTask 'test', ['coffeelint', 'cafemocha']
+  @registerTask 'test', ['coffeelint', 'noflo_manifest', 'cafemocha']
   @registerTask 'default', ['test']
