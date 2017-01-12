@@ -13,7 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "noflo": "0.x >= 0.5",
-    "mandrill-api": "~1.0.45"
+    "mandrill-api": "^1.0.45"
   },
   "devDependencies": {
     "chai": "^3.5.0",
