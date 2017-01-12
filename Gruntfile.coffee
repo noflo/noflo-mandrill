@@ -4,7 +4,7 @@ module.exports = ->
     pkg: @file.readJSON 'package.json'
 
     # BDD tests on Node.js
-    cafemocha:
+    mochaTest:
       nodejs:
         src: ['spec/*.coffee']
         options:
@@ -15,8 +15,8 @@ module.exports = ->
       components: ['components/*.coffee']
 
   # Grunt plugins used for testing
-  @loadNpmTasks 'grunt-cafe-mocha'
+  @loadNpmTasks 'grunt-mocha-test'
   @loadNpmTasks 'grunt-coffeelint'
 
-  @registerTask 'test', ['coffeelint', 'cafemocha']
+  @registerTask 'test', ['coffeelint', 'mochaTest']
   @registerTask 'default', ['test']
