@@ -30,5 +30,7 @@
       "SendTemplate": "./components/SendTemplate.coffee"
     }
   },
-  "keywords": []
+  "keywords": [
+    "noflo"
+  ]
 }
