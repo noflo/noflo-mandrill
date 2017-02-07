@@ -1,6 +1,12 @@
 noflo = require 'noflo'
-chai = require 'chai' unless chai
-SendTemplate = require '../components/SendTemplate.coffee'
+Send = require '../components/SendTemplate.coffee'
+
+unless noflo.isBrowser()
+  chai = require 'chai'
+  path = require 'path'
+  baseDir = path.resolve __dirname, '../'
+else
+  baseDir = 'noflo-mandril'
 
 describe 'SendTemplate component', ->
   c = null
@@ -9,18 +15,39 @@ describe 'SendTemplate component', ->
   message = null
   key = null
   status = null
-  beforeEach ->
-    c = SendTemplate.getComponent()
+
+  before (done) ->
+    c = Send.getComponent()
     template = noflo.internalSocket.createSocket()
     content = noflo.internalSocket.createSocket()
     message = noflo.internalSocket.createSocket()
     key = noflo.internalSocket.createSocket()
-    status = noflo.internalSocket.createSocket()
     c.inPorts.template.attach template
     c.inPorts.content.attach content
     c.inPorts.message.attach message
     c.inPorts.key.attach key
+    done()
+    return
+
+    loader = new noflo.ComponentLoader baseDir
+    loader.load 'mandril/SendTemplate', (err, instance) ->
+      return done err if err
+      c = instance
+      template = noflo.internalSocket.createSocket()
+      content = noflo.internalSocket.createSocket()
+      message = noflo.internalSocket.createSocket()
+      key = noflo.internalSocket.createSocket()
+      c.inPorts.template.attach template
+      c.inPorts.content.attach content
+      c.inPorts.message.attach message
+      c.inPorts.key.attach key
+      done()
+
+  beforeEach ->
+    status = noflo.internalSocket.createSocket()
     c.outPorts.status.attach status
+  afterEach ->
+    c.outPorts.status.detach status
 
   describe 'when instantiated', ->
     it 'should have an key port', ->
