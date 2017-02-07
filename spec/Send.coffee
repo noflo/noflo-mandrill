@@ -6,7 +6,7 @@ unless noflo.isBrowser()
   path = require 'path'
   baseDir = path.resolve __dirname, '../'
 else
-  baseDir = 'noflo-mandril'
+  baseDir = 'noflo-mandrill'
 
 describe 'Send component', ->
   c = null
@@ -24,7 +24,7 @@ describe 'Send component', ->
     return
 
     loader = new noflo.ComponentLoader baseDir
-    loader.load 'noflo-mandril/Send', (err, instance) ->
+    loader.load 'noflo-mandrill/Send', (err, instance) ->
       return done err if err
       c = instance
       message = noflo.internalSocket.createSocket()
