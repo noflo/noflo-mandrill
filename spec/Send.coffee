@@ -15,16 +15,8 @@ describe 'Send component', ->
   status = null
 
   before (done) ->
-    c = Send.getComponent()
-    message = noflo.internalSocket.createSocket()
-    key = noflo.internalSocket.createSocket()
-    c.inPorts.message.attach message
-    c.inPorts.key.attach key
-    done()
-    return
-
     loader = new noflo.ComponentLoader baseDir
-    loader.load 'noflo-mandrill/Send', (err, instance) ->
+    loader.load 'mandrill/Send', (err, instance) ->
       return done err if err
       c = instance
       message = noflo.internalSocket.createSocket()
@@ -33,15 +25,18 @@ describe 'Send component', ->
       c.inPorts.key.attach key
       done()
 
-  beforeEach ->
+  beforeEach (done) ->
     status = noflo.internalSocket.createSocket()
     c.outPorts.status.attach status
-  afterEach ->
+    done()
+  afterEach (done) ->
     c.outPorts.status.detach status
+    done()
 
   describe 'when instantiated', ->
-    it 'should have an key port', ->
+    it 'should have an key port', (done) ->
       chai.expect(c.inPorts.key).to.be.an 'object'
-    it 'should have an status port', ->
+      done()
+    it 'should have an status port', (done) ->
       chai.expect(c.outPorts.status).to.be.an 'object'
-
+      done()
