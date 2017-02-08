@@ -2,64 +2,65 @@ noflo = require 'noflo'
 mandrill = require 'mandrill-api/mandrill'
 
 exports.getComponent = ->
-  component = new noflo.Component
+  c = new noflo.Component
+    inPorts:
+      template:
+        datatype: 'string'
+        control: true
+      content:
+        datatype: 'object'
+        control: true
+      message:
+        datatype: 'object'
+        control: true
+      key:
+        datatype: 'string'
+        control: true
+      retries:
+        datatype: 'int'
+        control: true
+        default: 0
+      async:
+        datatype: 'boolean'
+        control: true
+        default: false
+    outPorts:
+      async:
+        datatype: 'boolean'
+      retries:
+        datatype: 'int'
+      status:
+        datatype: 'object'
+      error:
+        datatype: 'object'
 
-  component.inPorts.add 'template',
-    datatype: 'string'
-    required: true
-  component.inPorts.add 'content',
-    datatype: 'object'
-    required: true
-  component.inPorts.add 'message',
-    datatype: 'object'
-    required: true
-  component.inPorts.add 'key',
-    datatype: 'string'
-    process: (event, payload) ->
-      component.client = new mandrill.Mandrill payload if event is 'data'
-  component.inPorts.add 'async',
-    datatype: 'boolean'
-  component.inPorts.add 'retries',
-    datatype: 'int'
-  component.outPorts.add 'status',
-    datatype: 'object'
-  component.outPorts.add 'error',
-    datatype: 'object'
-  component.client = null
+  c.process (input, output) ->
+    return unless input.has 'message', 'content', 'key'
 
-  noflo.helpers.WirePattern component,
-    in: ['message', 'content']
-    params: ['template', 'async', 'retries']
-    out: 'status'
-    async: true
-    forwardGroups: true
-  , (input, groups, out, done) ->
-    return callback new Error 'Missing Mandrill API key' unless component.client
-    async = if component.params.async then true else false
-    attempts = 0
-    retries = Number component.params.retries
+    async = input.getData 'retries'
+    retries = Number input.getData 'retries'
+    key = input.getData 'key'
+    client = new mandrill.Mandrill key
+    template = input.getData 'template'
+
     send = ->
       attempts++
       fail = (error) ->
         if retries and attempts <= retries
-          setTimeout ->
-            send()
-          , 1000
+          setTimeout send, 1000
         else
-          done error
-      component.client.messages.sendTemplate
-        template_name: component.params.template
-        template_content: input.content
-        message: input.message
+          output.done error
+      client.messages.sendTemplate
+        template_name: template
+        template_content: content
+        message: message
         async: async
       , (result) ->
         if result.length > 0
-          out.send status for status in result
-          done()
+          output.send status: status for status in result
+          output.done()
         else
           fail new Error 'Mandrill returned empty result'
       , (error) ->
         fail error
     send()
-
-  component
